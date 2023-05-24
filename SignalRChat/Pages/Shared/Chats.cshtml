@@ -1,0 +1,21 @@
+﻿@model SignalRChat.Data.ChatsModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>title</title>
+</head>
+<body>
+<div>
+      @foreach (var user in Model.Chats)
+      {
+          <div><a href="/im/chat?id=@user.Id">@user.UserName</a></div>
+      }
+</div>
+</body>
+</html>

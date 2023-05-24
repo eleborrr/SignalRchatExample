@@ -1,0 +1,41 @@
+﻿@model SignalRChat.Data.ChatModel;
+
+
+<div>
+    @* <input type="text" id="toUserInput" placeholder="To Username" /> *@
+    <input type="text" id="messageInput" placeholder="Message" />
+    <button id="sendButton">Send</button>
+    <h5>from: @Model.UserId</h5>
+    <h5>to: @Model.RecieverId</h5>
+</div>
+
+<ul id="messagesList"></ul>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+    <script>
+        var connection = new signalR.HubConnectionBuilder().withUrl("/chat").build();
+       
+        connection.on("ReceivePrivateMessage", function (user, message) {
+            var li = document.createElement("li");
+            li.textContent = user + " (private): " + message;
+            document.getElementById("messagesList").appendChild(li);
+        });
+
+        connection.start().then(res => {
+            connection.invoke("GetGroupMessages", `@Model.RoomName`, `@Model.UserId`)
+            .catch(function (err) {
+            return console.error(err.toString());
+        })});
+
+        document.getElementById("sendButton").addEventListener("click", function (event) {
+            var message = document.getElementById("messageInput").value;
+            // var toUser = document.getElementById("toUserInput").value;
+            connection.invoke("SendPrivateMessage", `@Model.UserId`, message, `@Model.RecieverId`, `@Model.RoomName`).catch(function (err) {
+                return console.error(err.toString());
+            });
+
+            event.preventDefault();
+        });
+    </script>
+}
